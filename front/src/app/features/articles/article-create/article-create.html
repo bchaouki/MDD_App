@@ -1,0 +1,39 @@
+<section class="page">
+  <div class="page-title">
+    <app-back-button link="/feed" />
+    <h1>Créer un nouvel article</h1>
+  </div>
+
+  <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <mat-form-field appearance="outline">
+      <mat-label>Sélectionner un thème</mat-label>
+      <mat-select formControlName="topicId">
+        @for (topic of topics(); track topic.id) {
+          <mat-option [value]="topic.id">{{ topic.title }}</mat-option>
+        }
+      </mat-select>
+      <mat-error>Le thème est obligatoire</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Titre de l'article</mat-label>
+      <input matInput formControlName="title" maxlength="255" />
+      <mat-error>Le titre est obligatoire</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Contenu de l'article</mat-label>
+      <textarea matInput formControlName="content" rows="10"></textarea>
+      @if (form.controls.content.hasError('required')) {
+        <mat-error>Le contenu est obligatoire</mat-error>
+      }
+      @if (form.controls.content.hasError('maxlength')) {
+        <mat-error>20 000 caractères maximum</mat-error>
+      }
+    </mat-form-field>
+
+    <app-form-error [message]="error()" />
+
+    <button matButton="filled" type="submit" [disabled]="submitting()">Créer</button>
+  </form>
+</section>

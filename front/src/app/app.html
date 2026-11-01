@@ -1,0 +1,31 @@
+<mat-sidenav-container class="app">
+  <mat-sidenav #sidenav class="app__sidenav" mode="over" position="end">
+    @if (isLogged()) {
+      <nav class="app__sidenav-nav" aria-label="Menu mobile">
+        @for (link of navLinks; track link.path) {
+          <a [routerLink]="link.path" routerLinkActive="active" (click)="sidenav.close()">
+            {{ link.label }}
+          </a>
+        }
+        <a
+          routerLink="/me"
+          routerLinkActive="active"
+          class="app__sidenav-profile"
+          aria-label="Mon profil"
+          (click)="sidenav.close()"
+        >
+          <mat-icon>account_circle</mat-icon>
+        </a>
+      </nav>
+    }
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    @if (showHeader()) {
+      <app-header (menuToggle)="sidenav.toggle()" />
+    }
+    <main>
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

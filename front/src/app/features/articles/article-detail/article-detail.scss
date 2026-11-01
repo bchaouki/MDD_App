@@ -1,0 +1,16 @@
+@use 'variables' as *;
+
+.article__meta {
+  margin-bottom: $space-m;
+}
+
+.article__content {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+  margin-bottom: $space-l;
+}
+
+.article__comments-title {
+  margin-top: $space-l;
+}

@@ -1,0 +1,54 @@
+@use 'variables' as *;
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: $header-height;
+  padding: 0 $space-l;
+  border-bottom: 1px solid $color-border;
+
+  @include mobile {
+    height: 64px;
+    padding: 0 $space-m;
+  }
+}
+
+.header__logo img {
+  display: block;
+  height: 56px;
+
+  @include mobile {
+    height: 44px;
+  }
+}
+
+.header__nav {
+  display: flex;
+  align-items: center;
+  gap: $space-l;
+}
+
+.header__link {
+  text-decoration: none;
+  font-weight: 500;
+
+  &--active {
+    color: $color-primary;
+  }
+}
+
+.header__profile {
+  display: flex;
+  color: $color-text-muted;
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+  }
+
+  &--active {
+    color: $color-primary;
+  }
+}

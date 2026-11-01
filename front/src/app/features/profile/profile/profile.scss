@@ -1,0 +1,24 @@
+@use '@angular/material' as mat;
+@use 'variables' as *;
+
+.profile__logout {
+  display: flex;
+  justify-content: flex-end;
+}
+
+// Material 3 n'a plus d'attribut `color="warn"` : on applique la couleur d'erreur du thème.
+.profile__logout-button {
+  @include mat.button-overrides(
+    (
+      text-label-text-color: var(--mat-sys-error),
+    )
+  );
+}
+
+.profile__title {
+  text-align: center;
+}
+
+.profile__divider {
+  margin: $space-xl 0 $space-l;
+}

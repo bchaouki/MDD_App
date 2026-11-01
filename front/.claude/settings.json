@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx cypress *)",
+      "Bash(npm install *)",
+      "Bash(grep -vE '^\\\\s*$')",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:4200)"
+    ]
+  }
+}

@@ -1,0 +1,42 @@
+@use 'variables' as *;
+
+.app {
+  min-height: 100vh;
+  background: white;
+}
+
+.app__sidenav {
+  width: 60vw;
+  max-width: 280px;
+}
+
+.app__sidenav-nav {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  height: 100%;
+  gap: $space-l;
+  padding: $space-xl $space-l;
+  box-sizing: border-box;
+
+  a {
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 18px;
+  }
+
+  .active {
+    color: $color-primary;
+  }
+}
+
+.app__sidenav-profile {
+  margin-top: auto;
+  color: $color-text-muted;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+  }
+}

@@ -1,0 +1,25 @@
+<section class="page">
+  <div class="page-title">
+    <app-back-button link="/" />
+  </div>
+
+  <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <h1>Se connecter</h1>
+
+    <mat-form-field appearance="outline">
+      <mat-label>E-mail ou nom d'utilisateur</mat-label>
+      <input matInput formControlName="identifier" autocomplete="username" />
+      <mat-error>Ce champ est obligatoire</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Mot de passe</mat-label>
+      <input matInput type="password" formControlName="password" autocomplete="current-password" />
+      <mat-error>Le mot de passe est obligatoire</mat-error>
+    </mat-form-field>
+
+    <app-form-error [message]="error()" />
+
+    <button matButton="filled" type="submit" [disabled]="submitting()">Se connecter</button>
+  </form>
+</section>

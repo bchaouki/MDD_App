@@ -1,0 +1,32 @@
+<section class="page">
+  @if (article(); as article) {
+    <div class="page-title">
+      <app-back-button link="/feed" />
+      <h1>{{ article.title }}</h1>
+    </div>
+
+    <div class="card__meta article__meta">
+      <span>{{ article.createdAt | date: 'longDate' }}</span>
+      <span>{{ article.authorUsername }}</span>
+      <span>{{ article.topicTitle }}</span>
+    </div>
+    <p class="article__content">{{ article.content }}</p>
+
+    <mat-divider />
+
+    <h2 class="article__comments-title">Commentaires</h2>
+    <app-comment-list [comments]="comments()" />
+    <app-comment-form
+      #commentForm
+      [sending]="sendingComment()"
+      (send)="addComment($event, commentForm)"
+    />
+  } @else if (error()) {
+    <div class="empty-state">
+      <p>{{ error() }}</p>
+      <a matButton="filled" routerLink="/feed">Retour aux articles</a>
+    </div>
+  } @else {
+    <mat-spinner class="spinner" diameter="40" />
+  }
+</section>

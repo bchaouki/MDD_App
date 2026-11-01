@@ -1,0 +1,29 @@
+<header class="header">
+  <a class="header__logo" [routerLink]="isLogged() ? '/feed' : '/'">
+    <img src="logo_p6.png" alt="MDD - Monde de Dév" />
+  </a>
+
+  @if (isLogged()) {
+    @if (isHandset()) {
+      <button matIconButton type="button" aria-label="Ouvrir le menu" (click)="menuToggle.emit()">
+        <mat-icon>menu</mat-icon>
+      </button>
+    } @else {
+      <nav class="header__nav" aria-label="Navigation principale">
+        @for (link of navLinks; track link.path) {
+          <a class="header__link" [routerLink]="link.path" routerLinkActive="header__link--active">
+            {{ link.label }}
+          </a>
+        }
+        <a
+          class="header__profile"
+          routerLink="/me"
+          routerLinkActive="header__profile--active"
+          aria-label="Mon profil"
+        >
+          <mat-icon>account_circle</mat-icon>
+        </a>
+      </nav>
+    }
+  }
+</header>

@@ -1,0 +1,11 @@
+@use 'variables' as *;
+
+.comment-form {
+  display: flex;
+  align-items: center;
+  gap: $space-s;
+}
+
+.comment-form__field {
+  flex: 1;
+}

@@ -1,0 +1,43 @@
+<section class="page">
+  <div class="page-toolbar">
+    <a matButton="filled" routerLink="/articles/new">Créer un article</a>
+    <button
+      matButton
+      type="button"
+      class="feed__sort"
+      (click)="toggleSort()"
+      [attr.aria-label]="
+        sort() === 'desc'
+          ? 'Trier du plus ancien au plus récent'
+          : 'Trier du plus récent au plus ancien'
+      "
+    >
+      Trier par
+      <mat-icon iconPositionEnd>{{
+        sort() === 'desc' ? 'arrow_downward' : 'arrow_upward'
+      }}</mat-icon>
+    </button>
+  </div>
+
+  <app-form-error [message]="error()" />
+
+  @if (articles(); as articles) {
+    @if (articles.length) {
+      <div class="card-grid">
+        @for (article of articles; track article.id) {
+          <app-article-card [article]="article" />
+        }
+      </div>
+    } @else {
+      <div class="empty-state">
+        <p>Aucun article pour le moment.</p>
+        <p>
+          Abonnez-vous à des <a routerLink="/topics">thèmes</a> pour alimenter votre fil
+          d'actualité.
+        </p>
+      </div>
+    }
+  } @else {
+    <mat-spinner class="spinner" diameter="40" />
+  }
+</section>

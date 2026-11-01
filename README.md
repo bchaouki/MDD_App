@@ -1,25 +1,95 @@
-# P6-Full-Stack-reseau-dev
+# MDD — Monde de Dév
 
-## Front
+Réseau social pour développeurs : abonnement à des thèmes, fil d'actualité, articles et commentaires.
+L'architecture est décrite dans [ARCHITECTURE.md](ARCHITECTURE.md).
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 14.1.3.
+| Dossier | Contenu |
+|---|---|
+| `back/` | API REST Spring Boot 4.1 / Java 21 (`mdd-api`) |
+| `front/` | SPA Angular 21 (standalone, signals, zoneless) + Angular Material |
+| `database/` | `schema.sql` (tables) et `data.sql` (thèmes initiaux) |
 
-Don't forget to install your node_modules before starting (`npm install`).
+## Prérequis
 
-### Development server
+- Java 21 (Maven est fourni par le wrapper `back/mvnw`)
+- Node.js 20.19+, 22.12+ ou 24+ et npm
+- MySQL 8
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+## 1. Base de données
 
-### Build
+```bash
+mysql -u root -p < database/schema.sql
+mysql -u root -p < database/data.sql
+```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Créer ensuite un utilisateur dédié :
 
-### Where to start
+```sql
+CREATE USER 'mdd'@'localhost' IDENTIFIED BY 'un-mot-de-passe';
+GRANT SELECT, INSERT, UPDATE, DELETE ON mdd.* TO 'mdd'@'localhost';
+```
 
-As you may have seen if you already started the app, a simple home page containing a logo, a title and a button is available. If you take a look at its code (in the `home.component.html`) you will see that an external UI library is already configured in the project.
+Hibernate tourne en `ddl-auto=validate` : il vérifie le schéma au démarrage mais ne le modifie jamais.
 
-This library is `@angular/material`, it's one of the most famous in the angular ecosystem. As you can see on their docs (https://material.angular.io/), it contains a lot of highly customizable components that will help you design your interfaces quickly.
+## 2. API (`back/`)
 
-Note: I recommend to use material however it's not mandatory, if you prefer you can get rid of it.
+La configuration se fait par variables d'environnement. En local, créer un fichier `back/.env`
+(non versionné, lu automatiquement grâce à `spring.config.import`) :
 
-Good luck!
+```properties
+DB_URL=jdbc:mysql://localhost:3306/mdd
+DB_USERNAME=mdd
+DB_PASSWORD=un-mot-de-passe
+JWT_SECRET=une-chaine-aleatoire-d-au-moins-32-caracteres
+```
+
+| Variable | Description |
+|---|---|
+| `DB_URL` | URL JDBC (défaut : `jdbc:mysql://localhost:3306/mdd`) |
+| `DB_USERNAME` / `DB_PASSWORD` | identifiants MySQL |
+| `JWT_SECRET` | secret de signature HS256, **au moins 32 caractères** (`openssl rand -base64 48`) |
+
+```bash
+cd back
+./mvnw spring-boot:run          # Windows : mvnw.cmd spring-boot:run
+```
+
+L'API écoute sur `http://localhost:8080/api`.
+
+### Documentation Swagger
+
+| | URL |
+|---|---|
+| Interface Swagger UI | http://localhost:8080/swagger-ui.html |
+| Contrat OpenAPI (JSON) | http://localhost:8080/v3/api-docs |
+
+Ces deux URL sont publiques. Pour tester une route protégée depuis Swagger UI :
+
+1. appeler `POST /api/auth/login` (ou `/register`) et copier le `token` renvoyé ;
+2. cliquer sur **Authorize** et coller le jeton (sans le préfixe `Bearer`) ;
+3. toutes les requêtes suivantes envoient `Authorization: Bearer <token>`.
+
+### Tests
+
+Les tests utilisent une base H2 en mémoire (profil `test`) : aucune base MySQL n'est nécessaire.
+
+```bash
+./mvnw test
+```
+
+## 3. Front (`front/`)
+
+```bash
+cd front
+npm install
+npm start       # http://localhost:4200
+```
+
+En développement, `ng serve` relaie `/api` vers `http://localhost:8080` (`proxy.conf.json`) :
+il n'y a pas de CORS à gérer. L'API doit donc être lancée en parallèle.
+
+```bash
+npm run build              # build de production dans dist/front
+npx ng test --watch=false  # tests unitaires (Vitest + jsdom, aucun navigateur requis)
+npm run cypress:run        # tests end-to-end Cypress (front lancé sur :4200)
+```

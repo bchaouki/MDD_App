@@ -1,0 +1,26 @@
+// Couleurs et espacements partagés (maquettes Figma MDD).
+$color-primary: #7763c5;
+$color-primary-dark: #6451b8;
+$color-surface: #f5f5f5;
+$color-border: #e0e0e0;
+$color-text: #1f1f1f;
+$color-text-muted: #6b6b6b;
+$color-error: #d32f2f;
+
+$space-xs: 4px;
+$space-s: 8px;
+$space-m: 16px;
+$space-l: 24px;
+$space-xl: 40px;
+
+$radius: 12px;
+$page-max-width: 1200px;
+$header-height: 80px;
+
+$breakpoint-mobile: 768px;
+
+@mixin mobile {
+  @media (max-width: $breakpoint-mobile) {
+    @content;
+  }
+}
