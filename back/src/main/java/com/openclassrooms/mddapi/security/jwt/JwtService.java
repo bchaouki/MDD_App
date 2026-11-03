@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 public class JwtService {
@@ -47,6 +48,8 @@ public class JwtService {
         Long id = userPrincipal.id();
         String username= userPrincipal.username();
         JwtClaimsSet claims = JwtClaimsSet.builder()
+                // Identifiant unique (jti) : permet de révoquer ce jeton à la déconnexion
+                .id(UUID.randomUUID().toString())
                 .issuer("self")
                 .issuedAt(now)
                 .expiresAt(now.plus(jwtExpiration, ChronoUnit.HOURS))

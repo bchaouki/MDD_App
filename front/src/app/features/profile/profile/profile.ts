@@ -117,7 +117,7 @@ export class Profile {
   }
 
   logout(): void {
-    this.session.logOut();
+    this.session.signOut();
   }
 
   private setPending(id: number, pending: boolean): void {

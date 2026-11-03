@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, catchError, of, tap } from 'rxjs';
+import { Observable, catchError, finalize, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { User } from '../models/user';
 import { TokenStorageService } from './token-storage.service';
@@ -40,6 +40,22 @@ export class SessionService {
     return this.loadUser().pipe(catchError(() => of(null)));
   }
 
+  /**
+   * Déconnexion demandée par l'utilisateur : le serveur révoque d'abord le jeton
+   * (il ne pourra plus être réutilisé), puis la session locale est effacée,
+   * même si l'appel échoue.
+   */
+  signOut(redirectTo = '/'): void {
+    this.http
+      .post<void>(`${environment.apiUrl}/auth/logout`, null)
+      .pipe(
+        catchError(() => of(null)),
+        finalize(() => this.logOut(redirectTo)),
+      )
+      .subscribe();
+  }
+
+  /** Efface la session locale (sans appel API, ex. après une 401). */
   logOut(redirectTo = '/'): void {
     this.tokenStorage.clear();
     this.userState.set(null);

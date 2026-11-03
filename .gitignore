@@ -1,0 +1,4 @@
+# Claude Code (configuration locale, ne pas versionner)
+.claude/
+CLAUDE.md
+CLAUDE.local.md

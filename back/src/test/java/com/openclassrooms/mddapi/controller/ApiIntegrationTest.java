@@ -1,7 +1,5 @@
 package com.openclassrooms.mddapi.controller;
 
-import com.openclassrooms.mddapi.exception.ConflictException;
-import com.openclassrooms.mddapi.exception.NotFoundException;
 import com.openclassrooms.mddapi.model.Topic;
 import com.openclassrooms.mddapi.model.User;
 import com.openclassrooms.mddapi.repository.ArticleRepository;
@@ -22,7 +20,6 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -102,6 +99,24 @@ class ApiIntegrationTest {
     }
 
     @Test
+    void logoutRevokesTheToken() throws Exception {
+        createUser("alice", "alice@mail.com");
+        String token = login("alice");
+        String otherSession = login("alice");
+
+        mockMvc.perform(post("/api/auth/logout")).andExpect(status().isUnauthorized());
+
+        mockMvc.perform(auth(get("/api/users/me"), token)).andExpect(status().isOk());
+        mockMvc.perform(auth(post("/api/auth/logout"), token)).andExpect(status().isNoContent());
+
+        // Le jeton n'a pas expiré mais il est refusé
+        mockMvc.perform(auth(get("/api/users/me"), token)).andExpect(status().isUnauthorized());
+        mockMvc.perform(auth(post("/api/auth/logout"), token)).andExpect(status().isUnauthorized());
+        // Une autre connexion du même utilisateur reste valide
+        mockMvc.perform(auth(get("/api/users/me"), otherSession)).andExpect(status().isOk());
+    }
+
+    @Test
     void profileCanBeReadAndUpdated() throws Exception {
         String token = createUserAndLogin("alice", "alice@mail.com");
         createUser("bob", "bob@mail.com");
@@ -111,9 +126,10 @@ class ApiIntegrationTest {
                 .andExpect(jsonPath("$.username").value("alice"))
                 .andExpect(jsonPath("$.password").doesNotExist());
 
-        assertThatThrownBy(() -> mockMvc.perform(json(auth(put("/api/users/me"), token),
-                        Map.of("username", "bob", "email", "alice@mail.com"))))
-                .hasRootCauseInstanceOf(ConflictException.class);
+        mockMvc.perform(json(auth(put("/api/users/me"), token),
+                        Map.of("username", "bob", "email", "alice@mail.com")))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409));
 
         mockMvc.perform(json(auth(put("/api/users/me"), token),
                         Map.of("username", "alice2", "email", "alice2@mail.com", "password", "NewPassw0rd!")))
@@ -134,8 +150,8 @@ class ApiIntegrationTest {
                 .andExpect(status().isCreated());
         mockMvc.perform(auth(post("/api/topics/{id}/subscribe", java.getId()), alice))
                 .andExpect(status().isCreated());
-        assertThatThrownBy(() -> mockMvc.perform(auth(post("/api/topics/{id}/subscribe", 9999), alice)))
-                .hasRootCauseInstanceOf(NotFoundException.class);
+        mockMvc.perform(auth(post("/api/topics/{id}/subscribe", 9999), alice))
+                .andExpect(status().isNotFound());
 
         mockMvc.perform(auth(get("/api/topics"), alice))
                 .andExpect(status().isOk())
@@ -177,8 +193,12 @@ class ApiIntegrationTest {
                 .andExpect(jsonPath("$.title").value("Mon article"))
                 .andExpect(jsonPath("$.authorUsername").value("alice"))
                 .andExpect(jsonPath("$.topicTitle").value("Java"));
-        assertThatThrownBy(() -> mockMvc.perform(auth(get("/api/articles/{id}", 9999), bob)))
-                .hasRootCauseInstanceOf(NotFoundException.class);
+        mockMvc.perform(auth(get("/api/articles/{id}", 9999), bob))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Article introuvable"));
+        mockMvc.perform(json(auth(post("/api/articles/{id}/comments", 9999), bob), Map.of("content", "Bravo")))
+                .andExpect(status().isNotFound());
 
         mockMvc.perform(json(auth(post("/api/articles/{id}/comments", articleId), bob), Map.of("content", "Bravo")))
                 .andExpect(status().isCreated())

@@ -81,4 +81,33 @@ describe('SessionService', () => {
     expect(session.isLogged()).toBe(false);
     expect(navigate).toHaveBeenCalledWith('/login');
   });
+
+  it('signOut revokes the token on the server, then clears the session', () => {
+    localStorage.setItem('mdd_token', 'stored');
+    const session = setup();
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl');
+
+    session.signOut();
+
+    const request = http.expectOne('/api/auth/logout');
+    expect(request.request.method).toBe('POST');
+    // Le jeton est encore présent pendant l'appel (l'intercepteur doit pouvoir l'envoyer)
+    expect(localStorage.getItem('mdd_token')).toBe('stored');
+    request.flush(null, { status: 204, statusText: 'No Content' });
+
+    expect(localStorage.getItem('mdd_token')).toBeNull();
+    expect(session.isLogged()).toBe(false);
+    expect(navigate).toHaveBeenCalledWith('/');
+  });
+
+  it('signOut clears the session even if the server call fails', () => {
+    localStorage.setItem('mdd_token', 'stored');
+    const session = setup();
+
+    session.signOut();
+    http.expectOne('/api/auth/logout').flush(null, { status: 500, statusText: 'Error' });
+
+    expect(localStorage.getItem('mdd_token')).toBeNull();
+    expect(session.isLogged()).toBe(false);
+  });
 });

@@ -459,7 +459,8 @@ sequenceDiagram
   - `ApiIntegrationTest` : parcours complet de l'API (`@SpringBootTest` + `MockMvc`) ;
   - `OpenApiDocsTest` : documentation Swagger générée et publique.
 - **Front** :
-  - tests unitaires Vitest + jsdom (`npx ng test --watch=false`) : guards, intercepteurs, `SessionService`, services HTTP, `Login`, `TopicCard`, validateurs ;
+  - tests unitaires Vitest + jsdom (`npx ng test --watch=false`) : guards, intercepteurs, `SessionService`, tous les services HTTP, toutes les pages (`Login`, `Register`, `Feed`, `ArticleCreate`, `ArticleDetail`, `TopicList`, `Profile`, `Landing`, `NotFound`), les composants partagés, les validateurs, les routes et la configuration ;
+  - couverture (`npm run test:coverage`, `@vitest/coverage-v8`) mesurée sur tous les fichiers de `src/app` : ≈ 97 % des lignes ;
   - tests end-to-end Cypress (`npm run cypress:run`) : page d'accueil et navigation.
 - **Git** : branche `main` stable, branches `feature/<sujet>`, commits conventionnels (`feat:`, `fix:`, `test:`, `docs:`).
 - Principes : SOLID, DRY, injection par constructeur, pas de logique dans les templates.

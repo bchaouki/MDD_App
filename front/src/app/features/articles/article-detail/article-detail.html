@@ -23,6 +23,9 @@
     />
   } @else if (error()) {
     <div class="empty-state">
+      @if (notFound()) {
+        <h1>Article introuvable</h1>
+      }
       <p>{{ error() }}</p>
       <a matButton="filled" routerLink="/feed">Retour aux articles</a>
     </div>

@@ -31,7 +31,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentMapper.toEntity(request);
         comment.setAuthor(currentUserProvider.getCurrentUserById());
         comment.setArticle(articleRepository.findById(articleId)
-                .orElseThrow(() -> new NotFoundException("Thème introuvable"))
+                .orElseThrow(() -> new NotFoundException("Article introuvable"))
         );
         return commentMapper.toDto(commentRepository.save(comment)) ;
     }

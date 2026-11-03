@@ -1,4 +1,5 @@
 import { DatePipe } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -50,6 +51,8 @@ export class ArticleDetail {
   private readonly commentsVersion = signal(0);
 
   readonly error = signal<string | null>(null);
+  /** true si l'API a répondu 404 (article inexistant). */
+  readonly notFound = signal(false);
   readonly sendingComment = signal(false);
 
   readonly article = toSignal(
@@ -57,7 +60,12 @@ export class ArticleDetail {
       switchMap((id) =>
         this.articleService.getById(id).pipe(
           catchError((err: unknown) => {
-            this.error.set(errorMessage(err, 'Article introuvable'));
+            this.error.set(
+              err instanceof HttpErrorResponse && err.status === 404
+                ? "Cet article n'existe pas ou a été supprimé."
+                : errorMessage(err, 'Impossible de charger cet article'),
+            );
+            this.notFound.set(err instanceof HttpErrorResponse && err.status === 404);
             return EMPTY;
           }),
         ),

@@ -91,5 +91,9 @@ il n'y a pas de CORS à gérer. L'API doit donc être lancée en parallèle.
 ```bash
 npm run build              # build de production dans dist/front
 npx ng test --watch=false  # tests unitaires (Vitest + jsdom, aucun navigateur requis)
+npm run test:coverage      # mêmes tests + couverture : front/coverage/front/index.html
 npm run cypress:run        # tests end-to-end Cypress (front lancé sur :4200)
 ```
+
+La couverture est calculée sur **tous** les fichiers de `src/app` (hors `*.spec.ts`),
+y compris ceux qu'aucun test ne charge : un composant sans test fait baisser le chiffre.
